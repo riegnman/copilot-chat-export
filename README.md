@@ -19,24 +19,31 @@ A VS Code extension that **automatically captures your GitHub Copilot Chat conve
 
 ## Installation
 
-The extension is packaged as a `.vsix` file located at:
+### Install from Release (`.vsix`)
 
-```
-C:\Users\wayne\copilot-chat-export\copilot-chat-export-0.1.0.vsix
-```
+#### Via Command Line
 
-### Install via Command Line
-
-```powershell
-code --install-extension C:\Users\wayne\copilot-chat-export\copilot-chat-export-0.1.0.vsix --force
+```bash
+code --install-extension copilot-chat-export-0.1.0.vsix --force
 ```
 
-### Install via VS Code UI
+#### Via VS Code UI
 
 1. Open VS Code
 2. Press `Ctrl+Shift+P` → type **"Install from VSIX"**
-3. Browse to the `.vsix` file above and select it
+3. Browse to the `.vsix` file and select it
 4. Reload VS Code when prompted
+
+### Install from Source
+
+```bash
+git clone https://github.com/riegnman/copilot-chat-export.git
+cd copilot-chat-export
+npm install
+npm run compile
+npx @vscode/vsce package --allow-missing-repository
+code --install-extension copilot-chat-export-0.1.0.vsix --force
+```
 
 ---
 
@@ -80,13 +87,26 @@ Open VS Code Settings (`Ctrl+,`) and search for **"copilotChatExport"** to confi
 | `copilotChatExport.gitRemoteUrl` | string | *(empty)* | GitHub repository URL for syncing exports. Supports HTTPS (`https://github.com/user/repo.git`) and SSH (`git@github.com:user/repo.git`). Leave empty to disable git sync. |
 | `copilotChatExport.gitBranch` | string | `main` | Git branch name to push chat exports to. |
 | `copilotChatExport.autoCommit` | boolean | `true` | Automatically commit to the local git repo after each export. Push is always manual. |
+| `copilotChatExport.vscodeDataPath` | string | *(empty)* | Custom path to your VS Code `User` data directory (contains `workspaceStorage/`). Leave empty to auto-detect. See [Platform Paths](#platform-paths) below. |
+
+### Platform Paths
+
+The extension **auto-detects** the correct VS Code data directory for your OS. You only need to set `copilotChatExport.vscodeDataPath` if auto-detection fails (e.g., portable install, non-standard location).
+
+| OS | Default auto-detected path |
+|----|---|
+| **Windows** | `%APPDATA%\Code\User` |
+| **macOS** | `~/Library/Application Support/Code/User` |
+| **Linux** | `~/.config/Code/User` (or `$XDG_CONFIG_HOME/Code/User`) |
+
+> For **VS Code Insiders**, the folder is `Code - Insiders` instead of `Code`. This is detected automatically.
 
 ### Example `settings.json`
 
 ```json
 {
     "copilotChatExport.outputFolder": ".copilot-chats",
-    "copilotChatExport.gitRemoteUrl": "https://github.com/riegnman/copilot-chats.git",
+    "copilotChatExport.gitRemoteUrl": "https://github.com/yourusername/copilot-chats.git",
     "copilotChatExport.gitBranch": "main",
     "copilotChatExport.autoCommit": true,
     "copilotChatExport.addToGitignore": true
@@ -214,8 +234,9 @@ If you want to force re-export everything:
 
 If you modify the source code, rebuild and reinstall:
 
-```powershell
-cd C:\Users\wayne\copilot-chat-export
+```bash
+# Navigate to the project directory
+cd copilot-chat-export
 
 # Install dependencies (first time only)
 npm install
@@ -224,7 +245,7 @@ npm install
 npm run compile
 
 # Package into .vsix
-echo "y" | vsce package --allow-missing-repository
+npx @vscode/vsce package --allow-missing-repository
 
 # Install into VS Code
 code --install-extension copilot-chat-export-0.1.0.vsix --force

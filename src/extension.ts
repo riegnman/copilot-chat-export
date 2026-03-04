@@ -85,12 +85,52 @@ export function activate(context: vscode.ExtensionContext) {
 
 // ─── File Watching ──────────────────────────────────────────────
 
-function getChatSessionDirs(): string[] {
-    const appData = process.env.APPDATA;
-    if (!appData) { return []; }
+/**
+ * Resolve the VS Code user data directory based on platform and configuration.
+ * Supports Windows, macOS, and Linux, as well as VS Code Insiders.
+ * Users can override via the copilotChatExport.vscodeDataPath setting.
+ */
+function getVSCodeUserDataPath(): string | undefined {
+    const config = vscode.workspace.getConfiguration('copilotChatExport');
+    const customPath = config.get<string>('vscodeDataPath', '').trim();
+    if (customPath && fs.existsSync(customPath)) {
+        return customPath;
+    }
 
-    const wsStorageRoot = path.join(appData, 'Code', 'User', 'workspaceStorage');
-    if (!fs.existsSync(wsStorageRoot)) { return []; }
+    const isInsiders = vscode.env.appName.toLowerCase().includes('insider');
+    const folderName = isInsiders ? 'Code - Insiders' : 'Code';
+
+    switch (process.platform) {
+        case 'win32': {
+            const appData = process.env.APPDATA;
+            if (appData) { return path.join(appData, folderName, 'User'); }
+            break;
+        }
+        case 'darwin': {
+            const home = process.env.HOME;
+            if (home) { return path.join(home, 'Library', 'Application Support', folderName, 'User'); }
+            break;
+        }
+        case 'linux': {
+            const configDir = process.env.XDG_CONFIG_HOME || path.join(process.env.HOME || '', '.config');
+            return path.join(configDir, folderName, 'User');
+        }
+    }
+    return undefined;
+}
+
+function getChatSessionDirs(): string[] {
+    const userDataPath = getVSCodeUserDataPath();
+    if (!userDataPath) {
+        outputChannel.appendLine('Could not determine VS Code user data path. Set copilotChatExport.vscodeDataPath in settings.');
+        return [];
+    }
+
+    const wsStorageRoot = path.join(userDataPath, 'workspaceStorage');
+    if (!fs.existsSync(wsStorageRoot)) {
+        outputChannel.appendLine(`Workspace storage not found at: ${wsStorageRoot}`);
+        return [];
+    }
 
     const dirs: string[] = [];
     try {

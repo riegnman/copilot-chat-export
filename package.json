@@ -104,6 +104,11 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically commit after each export. Push is always manual."
+        },
+        "copilotChatExport.vscodeDataPath": {
+          "type": "string",
+          "default": "",
+          "description": "Custom path to your VS Code User data directory (the folder containing workspaceStorage/). Leave empty to auto-detect based on your OS. Examples: Windows: %APPDATA%/Code/User, macOS: ~/Library/Application Support/Code/User, Linux: ~/.config/Code/User."
         }
       }
     }
