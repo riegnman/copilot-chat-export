@@ -1,0 +1,125 @@
+{
+  "name": "copilot-chat-export",
+  "displayName": "Copilot Chat Export",
+  "description": "Export Copilot Chat conversations to markdown files for later analysis",
+  "version": "0.1.0",
+  "publisher": "riegnman",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "copilot",
+    "chat",
+    "export",
+    "markdown",
+    "documentation"
+  ],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilot-chat-export.exportChat",
+        "title": "Export Copilot Chat to Markdown",
+        "category": "Copilot Chat Export",
+        "icon": "$(export)"
+      },
+      {
+        "command": "copilot-chat-export.openChatsFolder",
+        "title": "Open Chat Exports Folder",
+        "category": "Copilot Chat Export",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "copilot-chat-export.exportCurrentSession",
+        "title": "Export Current Chat Session",
+        "category": "Copilot Chat Export",
+        "icon": "$(file-symlink-file)"
+      },
+      {
+        "command": "copilot-chat-export.pushToGitHub",
+        "title": "Push Chat Exports to GitHub",
+        "category": "Copilot Chat Export",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "copilot-chat-export.gitStatus",
+        "title": "Show Chat Exports Git Status",
+        "category": "Copilot Chat Export",
+        "icon": "$(git-branch)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "copilot-chat-export.exportChat",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "chatIsVisible"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "copilot-chat-export.exportChat",
+          "group": "copilot"
+        },
+        {
+          "command": "copilot-chat-export.openChatsFolder",
+          "group": "copilot"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Copilot Chat Export",
+      "properties": {
+        "copilotChatExport.outputFolder": {
+          "type": "string",
+          "default": ".copilot-chats",
+          "description": "Folder name (relative to workspace root) where chat exports are saved."
+        },
+        "copilotChatExport.includeTimestamp": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include timestamp in the exported markdown header."
+        },
+        "copilotChatExport.addToGitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically add the exports folder to .gitignore."
+        },
+        "copilotChatExport.gitRemoteUrl": {
+          "type": "string",
+          "default": "",
+          "description": "GitHub repository URL (e.g. https://github.com/user/repo.git or git@github.com:user/repo.git). Leave empty to disable git sync."
+        },
+        "copilotChatExport.gitBranch": {
+          "type": "string",
+          "default": "main",
+          "description": "Git branch name to push chat exports to."
+        },
+        "copilotChatExport.autoCommit": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically commit after each export. Push is always manual."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  }
+}
